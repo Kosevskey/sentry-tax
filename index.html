@@ -147,10 +147,16 @@
     }
 
     .slider-ticks {
-      display: flex;
-      justify-content: space-between;
+      position: relative;
+      height: 14px;
       font-size: 11px;
       color: var(--text-muted);
+    }
+    .slider-ticks span {
+      position: absolute;
+      top: 0;
+      transform: translateX(-50%);
+      white-space: nowrap;
     }
 
     /* ─── Price Comparison ─── */
@@ -339,15 +345,15 @@
       <div class="event-count" id="eventDisplay">25,000</div>
       <input type="range" id="eventSlider" min="0" max="8" value="2" step="1" />
       <div class="slider-ticks">
-        <span>1k</span>
-        <span>10k</span>
-        <span>50k</span>
-        <span>100k</span>
-        <span>250k</span>
-        <span>500k</span>
-        <span>1M</span>
-        <span>2M</span>
-        <span>5M</span>
+        <span style="left:calc(8px + 0    * (100% - 16px))">1k</span>
+        <span style="left:calc(8px + 0.125 * (100% - 16px))">10k</span>
+        <span style="left:calc(8px + 0.25  * (100% - 16px))">50k</span>
+        <span style="left:calc(8px + 0.375 * (100% - 16px))">100k</span>
+        <span style="left:calc(8px + 0.5   * (100% - 16px))">250k</span>
+        <span style="left:calc(8px + 0.625 * (100% - 16px))">500k</span>
+        <span style="left:calc(8px + 0.75  * (100% - 16px))">1M</span>
+        <span style="left:calc(8px + 0.875 * (100% - 16px))">2M</span>
+        <span style="left:calc(8px + 1    * (100% - 16px))">5M</span>
       </div>
     </div>
 
