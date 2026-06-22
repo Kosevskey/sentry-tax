@@ -3,511 +3,517 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sentry Tax Calculator — What are you really paying for Python error monitoring?</title>
-  <meta name="description" content="See exactly how much you're paying in 'Sentry Tax' compared to Ravn. Transparent, open-source pricing calculator for Python developers." />
+  <title>Sentry Tax Calculator — Python Error Monitoring Pricing</title>
+  <meta name="description" content="See exactly how much you're paying in Sentry Tax compared to Ravn. Transparent, open-source pricing calculator for Python developers." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0d0d0d;
-      --surface: #161616;
-      --border: rgba(255,255,255,0.08);
-      --text: #e8e8e8;
-      --muted: #6b6b6b;
-      --accent: #4A80F5;
-      --danger: #f05252;
-      --green: #34c97b;
-      --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --bg:           #FFFFFF;
+      --bg-secondary: #F6F6F7;
+      --text:         #0B0B0C;
+      --text-2:       #4A4A50;
+      --text-muted:   #7A7A82;
+      --border:       #E5E5E8;
+      --accent:       #1A1A1C;
+      --accent-fg:    #FFFFFF;
+      --danger:       #DC2626;
+      --danger-soft:  rgba(220,38,38,0.07);
+      --success:      #16A34A;
+      --success-soft: rgba(22,163,74,0.07);
     }
 
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
-      line-height: 1.6;
-      min-height: 100vh;
+      font-family: 'Inter', 'SF Pro Text', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+
+    /* ─── Nav ─── */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -.01em;
+    }
+    .nav-logo span { color: var(--text-muted); font-weight: 400; }
+    .nav-link {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color .1s;
+    }
+    .nav-link:hover { color: var(--text); }
 
     /* ─── Header ─── */
-    header {
-      padding: 48px 0 40px;
+    .header {
+      padding: 56px 0 48px;
       border-bottom: 1px solid var(--border);
     }
-    .badge {
-      display: inline-block;
+    .eyebrow {
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: .08em;
       text-transform: uppercase;
-      color: var(--accent);
-      border: 1px solid rgba(74,128,245,.3);
-      border-radius: 4px;
-      padding: 3px 8px;
-      margin-bottom: 20px;
-    }
-    h1 {
-      font-size: clamp(26px, 5vw, 40px);
-      font-weight: 700;
-      line-height: 1.15;
-      letter-spacing: -.02em;
+      letter-spacing: .07em;
+      color: var(--text-muted);
       margin-bottom: 16px;
     }
-    h1 span { color: var(--danger); }
+    h1 {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 600;
+      letter-spacing: -.02em;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
     .subtitle {
-      font-size: 16px;
-      color: var(--muted);
-      max-width: 560px;
+      font-size: 14px;
+      color: var(--text-2);
+      max-width: 480px;
     }
 
     /* ─── Slider Section ─── */
-    .slider-section {
-      padding: 48px 0 0;
-    }
-    .slider-label {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
+    .section { padding: 40px 0; border-bottom: 1px solid var(--border); }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-bottom: 12px;
+      letter-spacing: .07em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
     }
-    .event-display {
-      font-family: var(--mono);
-      font-size: clamp(36px, 8vw, 64px);
-      font-weight: 700;
+
+    .event-count {
+      font-size: clamp(36px, 7vw, 56px);
+      font-weight: 600;
       letter-spacing: -.03em;
       line-height: 1;
-      margin-bottom: 24px;
+      color: var(--text);
+      margin-bottom: 28px;
     }
-    .event-display span { color: var(--accent); }
 
     input[type="range"] {
       -webkit-appearance: none;
       width: 100%;
-      height: 4px;
-      border-radius: 2px;
+      height: 2px;
       background: var(--border);
+      border-radius: 1px;
       outline: none;
       cursor: pointer;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
       background: var(--accent);
       cursor: pointer;
-      border: 3px solid var(--bg);
-      box-shadow: 0 0 0 1px var(--accent);
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px var(--border);
+      transition: box-shadow .1s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 1px var(--text-muted);
     }
     input[type="range"]::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
       background: var(--accent);
       cursor: pointer;
-      border: 3px solid var(--bg);
+      border: 2px solid var(--bg);
     }
 
     .slider-ticks {
       display: flex;
       justify-content: space-between;
       font-size: 11px;
-      color: var(--muted);
-      font-family: var(--mono);
-      margin-bottom: 48px;
+      color: var(--text-muted);
     }
 
-    /* ─── Comparison Cards ─── */
-    .comparison {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    @media (max-width: 520px) {
-      .comparison { grid-template-columns: 1fr; }
-    }
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 24px;
-    }
-    .card.highlight {
-      border-color: rgba(52, 201, 123, 0.3);
-      background: rgba(52, 201, 123, 0.04);
-    }
-    .card-provider {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .card-plan {
-      font-size: 14px;
-      color: var(--text);
-      margin-bottom: 20px;
-      min-height: 20px;
-    }
-    .card-price {
-      font-family: var(--mono);
-      font-size: clamp(28px, 5vw, 40px);
-      font-weight: 700;
-      letter-spacing: -.02em;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .card-price.sentry { color: var(--danger); }
-    .card-price.ravn { color: var(--green); }
-    .card-period {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    /* ─── Tax Banner ─── */
-    .tax-banner {
-      background: rgba(240,82,82,.06);
-      border: 1px solid rgba(240,82,82,.2);
-      border-radius: 8px;
-      padding: 28px 32px;
+    /* ─── Price Comparison ─── */
+    .price-row {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       justify-content: space-between;
-      gap: 24px;
-      flex-wrap: wrap;
-      margin-bottom: 48px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .price-row:first-child { border-top: 1px solid var(--border); }
+    .price-provider {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .price-plan {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 8px;
+    }
+    .price-amount {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+    }
+    .price-amount.sentry { color: var(--danger); }
+    .price-amount.ravn   { color: var(--success); }
+    .price-period {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+
+    /* ─── Tax Line ─── */
+    .tax-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 20px 0 0;
     }
     .tax-label {
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--danger);
-      margin-bottom: 4px;
-    }
-    .tax-desc { font-size: 14px; color: var(--muted); }
-    .tax-amount {
-      font-family: var(--mono);
-      font-size: clamp(32px, 6vw, 52px);
-      font-weight: 700;
-      color: var(--danger);
-      letter-spacing: -.02em;
-      white-space: nowrap;
-    }
-    .tax-period { font-size: 14px; color: var(--muted); }
-
-    /* ─── Breakdown Table ─── */
-    .section-title {
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--muted);
-      margin-bottom: 16px;
+      letter-spacing: .07em;
+      color: var(--text-muted);
     }
+    .tax-amount {
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 600;
+      letter-spacing: -.025em;
+      color: var(--danger);
+    }
+    .tax-zero { color: var(--text-muted); }
+    .tax-period { font-size: 13px; color: var(--text-muted); margin-left: 6px; }
+    .tax-note { font-size: 12px; color: var(--text-muted); padding-top: 6px; }
+
+    /* ─── Table ─── */
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 13px;
-      margin-bottom: 48px;
     }
     th {
       text-align: left;
-      padding: 8px 12px;
+      padding: 0 0 10px;
       font-size: 11px;
-      font-weight: 500;
-      color: var(--muted);
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: .06em;
+      letter-spacing: .07em;
+      color: var(--text-muted);
       border-bottom: 1px solid var(--border);
     }
+    th:not(:first-child) { text-align: right; }
     td {
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
       vertical-align: middle;
+      color: var(--text-2);
     }
+    td:not(:first-child) { text-align: right; }
     tr:last-child td { border-bottom: none; }
-    .tier-active td { background: rgba(74,128,245,.05); }
-    .tier-name { font-weight: 500; }
-    .tier-events { font-family: var(--mono); color: var(--muted); font-size: 12px; }
-    .tier-sentry { font-family: var(--mono); color: var(--danger); }
-    .tier-ravn { font-family: var(--mono); color: var(--green); }
-    .tier-save { font-family: var(--mono); font-weight: 600; }
-    .badge-current {
+    tr.row-active td { color: var(--text); font-weight: 500; }
+    tr.row-active td.col-sentry { color: var(--danger); }
+    tr.row-active td.col-ravn   { color: var(--success); }
+    tr.row-active td.col-save   { color: var(--success); }
+    .badge-you {
       display: inline-block;
       font-size: 10px;
       font-weight: 600;
-      padding: 1px 6px;
+      padding: 1px 5px;
       border-radius: 3px;
-      background: rgba(74,128,245,.15);
-      color: var(--accent);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
       margin-left: 6px;
       vertical-align: middle;
+      letter-spacing: 0;
+      text-transform: none;
     }
 
     /* ─── CTA ─── */
     .cta-section {
-      border-top: 1px solid var(--border);
-      padding: 48px 0;
+      padding: 56px 0;
       text-align: center;
     }
-    .cta-section h2 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
-    .cta-section p { color: var(--muted); margin-bottom: 28px; }
-    .btn {
-      display: inline-block;
-      padding: 12px 28px;
-      font-size: 14px;
+    .cta-section h2 {
+      font-size: 20px;
       font-weight: 600;
-      border-radius: 6px;
+      letter-spacing: -.01em;
+      margin-bottom: 8px;
+    }
+    .cta-section p {
+      font-size: 14px;
+      color: var(--text-2);
+      margin-bottom: 28px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      background: var(--accent);
+      color: var(--accent-fg);
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 500;
       text-decoration: none;
-      transition: opacity .15s;
+      margin-right: 8px;
+      transition: opacity .1s;
     }
-    .btn:hover { opacity: .85; }
-    .btn-primary { background: var(--accent); color: #fff; margin-right: 12px; }
+    .btn-primary:hover { opacity: .85; }
     .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      background: transparent;
+      color: var(--text-2);
       border: 1px solid var(--border);
-      color: var(--muted);
+      border-radius: 4px;
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color .1s, border-color .1s;
     }
+    .btn-ghost:hover { color: var(--text); border-color: var(--text-muted); }
 
     /* ─── Footer ─── */
     footer {
-      padding: 32px 0;
       border-top: 1px solid var(--border);
+      padding: 28px 0;
       font-size: 12px;
-      color: var(--muted);
-      text-align: center;
+      color: var(--text-muted);
       line-height: 1.8;
     }
-    footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+    footer a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 2px; }
 
-    .disclaimer {
-      margin-top: 12px;
-      font-size: 11px;
-      color: #444;
+    @media (max-width: 520px) {
+      .price-plan { display: none; }
+      .cta-section { text-align: left; }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-
-  <!-- Header -->
-  <header>
-    <div class="badge">Open Source · Transparent Pricing</div>
-    <h1>The <span>Sentry Tax</span> Calculator<br/>for Python Developers</h1>
-    <p class="subtitle">See exactly how much you're overpaying for error monitoring. Move the slider, see the math.</p>
-  </header>
-
-  <!-- Slider -->
-  <div class="slider-section">
-    <div class="slider-label">Monthly error events</div>
-    <div class="event-display"><span id="eventDisplay">50,000</span></div>
-    <input type="range" id="eventSlider" min="0" max="100" value="30" step="1" />
-    <div class="slider-ticks">
-      <span>1k</span>
-      <span>10k</span>
-      <span>50k</span>
-      <span>100k</span>
-      <span>250k</span>
-      <span>500k</span>
-      <span>1M</span>
-      <span>2M</span>
-      <span>5M</span>
+  <nav>
+    <div class="nav-inner">
+      <a href="https://getravn.com" class="nav-logo">sentry-tax <span>by Ravn</span></a>
+      <a href="https://github.com/Kosevskey/sentry-tax" class="nav-link">GitHub →</a>
     </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="eyebrow">Open source · Transparent pricing</div>
+      <h1>The Sentry Tax Calculator</h1>
+      <p class="subtitle">How much are you really paying for Python error monitoring? Move the slider and see the math.</p>
+    </div>
+
+    <!-- Slider -->
+    <div class="section">
+      <div class="section-label">Monthly error events</div>
+      <div class="event-count" id="eventDisplay">25,000</div>
+      <input type="range" id="eventSlider" min="0" max="100" value="25" step="1" />
+      <div class="slider-ticks">
+        <span>1k</span>
+        <span>10k</span>
+        <span>50k</span>
+        <span>100k</span>
+        <span>250k</span>
+        <span>500k</span>
+        <span>1M</span>
+        <span>2M</span>
+        <span>5M</span>
+      </div>
+    </div>
+
+    <!-- Price Comparison -->
+    <div class="section">
+      <div class="section-label">Monthly cost</div>
+
+      <div class="price-row">
+        <div>
+          <span class="price-provider">Sentry</span>
+          <span class="price-plan" id="sentryPlan">Team</span>
+        </div>
+        <div>
+          <span class="price-amount sentry" id="sentryPrice">$26</span>
+          <span class="price-period">/mo</span>
+        </div>
+      </div>
+
+      <div class="price-row">
+        <div>
+          <span class="price-provider">Ravn</span>
+          <span class="price-plan" id="ravnPlan">Solo</span>
+        </div>
+        <div>
+          <span class="price-amount ravn" id="ravnPrice">$9.99</span>
+          <span class="price-period">/mo</span>
+        </div>
+      </div>
+
+      <div class="tax-row">
+        <div>
+          <div class="tax-label">Your Sentry Tax</div>
+          <div class="tax-note" id="taxNote">per year, for the same monitoring</div>
+        </div>
+        <div style="text-align:right">
+          <span class="tax-amount" id="taxAmount">$193</span>
+          <span class="tax-period">/yr</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Breakdown Table -->
+    <div class="section">
+      <div class="section-label" style="margin-bottom:16px">Full breakdown</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Events/month</th>
+            <th>Sentry</th>
+            <th>Ravn</th>
+            <th>Savings/yr</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <h2>Stop paying the Sentry Tax.</h2>
+      <p>Two lines of Python. Same monitoring. A fraction of the price.</p>
+      <a href="https://app.getravn.com/register" class="btn-primary">Try Ravn free</a>
+      <a href="https://getravn.com/sentry-alternative.html" class="btn-ghost">Full comparison</a>
+    </div>
+
+    <footer>
+      <div>Sentry prices estimated from the Team plan ($26/mo, 50k events included) with $0.000290/additional event. Always verify at <a href="https://sentry.io/pricing/" target="_blank" rel="noopener">sentry.io/pricing</a>.</div>
+      <div>This calculator is <a href="https://github.com/Kosevskey/sentry-tax" target="_blank" rel="noopener">open source</a>. Sentry is a trademark of Functional Software, Inc.</div>
+    </footer>
+
   </div>
-
-  <!-- Price Cards -->
-  <div class="comparison">
-    <div class="card">
-      <div class="card-provider">Sentry</div>
-      <div class="card-plan" id="sentryPlan">Team</div>
-      <div class="card-price sentry" id="sentryPrice">$26</div>
-      <div class="card-period">per month</div>
-    </div>
-    <div class="card highlight">
-      <div class="card-provider">Ravn</div>
-      <div class="card-plan" id="ravnPlan">Solo</div>
-      <div class="card-price ravn" id="ravnPrice">$9.99</div>
-      <div class="card-period">per month</div>
-    </div>
-  </div>
-
-  <!-- Sentry Tax Banner -->
-  <div class="tax-banner">
-    <div>
-      <div class="tax-label">Your Sentry Tax</div>
-      <div class="tax-desc" id="taxDesc">What you pay extra every year</div>
-    </div>
-    <div>
-      <div class="tax-amount" id="taxAmount">$193</div>
-      <div class="tax-period">per year</div>
-    </div>
-  </div>
-
-  <!-- Tier Comparison Table -->
-  <div class="section-title">Full pricing breakdown</div>
-  <table>
-    <thead>
-      <tr>
-        <th>Events/month</th>
-        <th>Sentry</th>
-        <th>Ravn</th>
-        <th>You save</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
-
-  <!-- CTA -->
-  <div class="cta-section">
-    <h2>Stop paying the Sentry Tax.</h2>
-    <p>Two lines of Python. Same monitoring. A fraction of the price.</p>
-    <a href="https://app.getravn.com/register" class="btn btn-primary">Try Ravn Free</a>
-    <a href="https://getravn.com/sentry-alternative.html" class="btn btn-ghost">See full comparison →</a>
-  </div>
-
-  <footer>
-    <div>This calculator is <a href="https://github.com/Kosevskey/sentry-tax">open source</a> — methodology and formulas are public.</div>
-    <div>Sentry is a trademark of Functional Software, Inc. Pricing based on publicly available data as of 2026.</div>
-    <div class="disclaimer">Sentry prices shown are estimates using the Team plan base rate ($26/mo for 50k errors) with overage at ~$0.000290/event. Actual Sentry pricing may vary — always check <a href="https://sentry.io/pricing/" target="_blank" rel="noopener">sentry.io/pricing</a> for current rates.</div>
-  </footer>
-
-</div>
 
 <script>
-  // ─── Pricing Models ───────────────────────────────────────────────────────
+  // ─── Pricing ──────────────────────────────────────────────────────────────
 
-  const SENTRY_TIERS = [
-    { name: "Developer (Free)", maxEvents: 5_000,      monthlyBase: 0,   overagePerEvent: 0 },
-    { name: "Team",             maxEvents: 50_000,     monthlyBase: 26,  overagePerEvent: 0.000290 },
-    { name: "Team + overage",   maxEvents: 200_000,    monthlyBase: 26,  overagePerEvent: 0.000290 },
-    { name: "Team + overage",   maxEvents: 500_000,    monthlyBase: 26,  overagePerEvent: 0.000290 },
-    { name: "Team + overage",   maxEvents: 1_000_000,  monthlyBase: 26,  overagePerEvent: 0.000290 },
-    { name: "Team + overage",   maxEvents: 2_000_000,  monthlyBase: 26,  overagePerEvent: 0.000290 },
-    { name: "Team + overage",   maxEvents: 5_000_000,  monthlyBase: 26,  overagePerEvent: 0.000290 },
-  ];
-
-  const RAVN_TIERS = [
-    { name: "Free",     maxEvents: 5_000,      monthly: 0     },
-    { name: "Solo",     maxEvents: 50_000,     monthly: 9.99  },
-    { name: "Team",     maxEvents: 250_000,    monthly: 19.99 },
-    { name: "Business", maxEvents: 1_000_000,  monthly: 49.99 },
-    { name: "Business", maxEvents: 2_000_000,  monthly: 49.99 },
-    { name: "Business", maxEvents: 5_000_000,  monthly: 49.99 },
-  ];
-
-  function sentryPrice(events) {
-    if (events <= 5_000) return 0;
-    const overage = Math.max(0, events - 50_000);
-    return 26 + overage * 0.000290;
+  function sentryPrice(e) {
+    if (e <= 5000)  return 0;
+    return 26 + Math.max(0, e - 50000) * 0.000290;
   }
 
-  function sentryPlanName(events) {
-    if (events <= 5_000) return "Developer (Free)";
-    if (events <= 50_000) return "Team";
-    return "Team + overage charges";
+  function ravnPrice(e) {
+    if (e <= 5000)     return 0;
+    if (e <= 50000)    return 9.99;
+    if (e <= 250000)   return 19.99;
+    if (e <= 1000000)  return 49.99;
+    return 49.99;
   }
 
-  function ravnPrice(events) {
-    if (events <= 5_000)     return 0;
-    if (events <= 50_000)    return 9.99;
-    if (events <= 250_000)   return 19.99;
-    if (events <= 1_000_000) return 49.99;
-    return 49.99; // Business covers up to 1M; custom beyond that
+  function sentryPlan(e) {
+    if (e <= 5000)  return "Developer (Free)";
+    if (e <= 50000) return "Team";
+    return "Team + overage";
   }
 
-  function ravnPlanName(events) {
-    if (events <= 5_000)     return "Free";
-    if (events <= 50_000)    return "Solo";
-    if (events <= 250_000)   return "Team";
+  function ravnPlan(e) {
+    if (e <= 5000)    return "Free";
+    if (e <= 50000)   return "Solo";
+    if (e <= 250000)  return "Team";
     return "Business";
   }
 
-  // ─── Slider scale: log-ish, mapped 0–100 → 1k–5M ─────────────────────────
+  // ─── Slider scale (log-ish 0–100 → 1k–5M) ────────────────────────────────
 
-  const SLIDER_POINTS = [
-    1_000, 5_000, 10_000, 25_000, 50_000,
-    100_000, 200_000, 500_000, 1_000_000, 2_000_000, 5_000_000
-  ];
+  const PTS = [1000,5000,10000,25000,50000,100000,200000,500000,1000000,2000000,5000000];
 
   function sliderToEvents(v) {
-    const pct = v / 100;
-    const idx = pct * (SLIDER_POINTS.length - 1);
+    const idx = (v / 100) * (PTS.length - 1);
     const lo = Math.floor(idx), hi = Math.ceil(idx);
-    if (lo === hi) return SLIDER_POINTS[lo];
-    const t = idx - lo;
-    return Math.round(SLIDER_POINTS[lo] + t * (SLIDER_POINTS[hi] - SLIDER_POINTS[lo]));
+    if (lo === hi) return PTS[lo];
+    return Math.round(PTS[lo] + (idx - lo) * (PTS[hi] - PTS[lo]));
   }
 
-  function fmt(n) {
-    if (n >= 1_000_000) return (n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1) + "M";
-    if (n >= 1_000)     return (n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1) + "k";
+  function fmtE(n) {
+    if (n >= 1000000) return (n/1000000 % 1 === 0 ? n/1000000 : (n/1000000).toFixed(1)) + "M";
+    if (n >= 1000)    return (n/1000 % 1 === 0 ? n/1000 : (n/1000).toFixed(0)) + "k";
     return n.toString();
   }
 
-  function fmtPrice(p) {
+  function fmtP(p) {
     if (p === 0) return "$0";
     if (p < 10)  return "$" + p.toFixed(2);
     return "$" + Math.round(p);
   }
 
-  // ─── Table rows ───────────────────────────────────────────────────────────
+  // ─── Table ────────────────────────────────────────────────────────────────
 
-  const TABLE_BREAKPOINTS = [
-    1_000, 5_000, 10_000, 50_000, 100_000, 250_000, 500_000, 1_000_000, 2_000_000, 5_000_000
-  ];
+  const ROWS = [1000,5000,10000,50000,100000,250000,500000,1000000,2000000,5000000];
 
-  function buildTable(currentEvents) {
-    const tbody = document.getElementById("tableBody");
-    tbody.innerHTML = "";
-    TABLE_BREAKPOINTS.forEach(events => {
-      const s = sentryPrice(events);
-      const r = ravnPrice(events);
-      const save = s - r;
-      const isCurrent = events === TABLE_BREAKPOINTS.reduce((prev, cur) =>
-        Math.abs(cur - currentEvents) < Math.abs(prev - currentEvents) ? cur : prev
-      );
-      const tr = document.createElement("tr");
-      if (isCurrent) tr.className = "tier-active";
-      tr.innerHTML = `
-        <td class="tier-events">${fmt(events)}${isCurrent ? '<span class="badge-current">you</span>' : ""}</td>
-        <td class="tier-sentry">${fmtPrice(s)}/mo</td>
-        <td class="tier-ravn">${fmtPrice(r)}/mo</td>
-        <td class="tier-save" style="color:${save > 0 ? '#34c97b' : '#6b6b6b'}">${save > 0 ? "–" + fmtPrice(save) + "/mo" : "–"}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+  function buildTable(current) {
+    const closest = ROWS.reduce((a, b) => Math.abs(b - current) < Math.abs(a - current) ? b : a);
+    document.getElementById("tableBody").innerHTML = ROWS.map(e => {
+      const s = sentryPrice(e), r = ravnPrice(e);
+      const saveYr = (s - r) * 12;
+      const active = e === closest;
+      return `<tr class="${active ? "row-active" : ""}">
+        <td>${fmtE(e)}${active ? '<span class="badge-you">you</span>' : ""}</td>
+        <td class="col-sentry">${fmtP(s)}/mo</td>
+        <td class="col-ravn">${fmtP(r)}/mo</td>
+        <td class="col-save">${saveYr > 0 ? "–$" + Math.round(saveYr).toLocaleString() : "—"}</td>
+      </tr>`;
+    }).join("");
   }
 
-  // ─── Update UI ────────────────────────────────────────────────────────────
+  // ─── Update ───────────────────────────────────────────────────────────────
 
   function update() {
-    const val = parseInt(document.getElementById("eventSlider").value, 10);
-    const events = sliderToEvents(val);
-
+    const events = sliderToEvents(+document.getElementById("eventSlider").value);
     const s = sentryPrice(events);
     const r = ravnPrice(events);
     const annualTax = (s - r) * 12;
 
-    document.getElementById("eventDisplay").textContent = fmt(events) + " events/mo";
-    document.getElementById("sentryPrice").textContent = fmtPrice(s);
-    document.getElementById("ravnPrice").textContent = fmtPrice(r);
-    document.getElementById("sentryPlan").textContent = sentryPlanName(events);
-    document.getElementById("ravnPlan").textContent = ravnPlanName(events);
+    document.getElementById("eventDisplay").textContent = fmtE(events) + " events/mo";
+    document.getElementById("sentryPrice").textContent  = fmtP(s);
+    document.getElementById("ravnPrice").textContent    = fmtP(r);
+    document.getElementById("sentryPlan").textContent   = sentryPlan(events);
+    document.getElementById("ravnPlan").textContent     = ravnPlan(events);
 
+    const taxEl = document.getElementById("taxAmount");
     if (annualTax > 0) {
-      document.getElementById("taxAmount").textContent = "$" + Math.round(annualTax).toLocaleString();
-      document.getElementById("taxDesc").textContent =
-        `That's ${fmtPrice(s - r)}/month extra — or ${fmtPrice(annualTax)} wasted per year`;
+      taxEl.textContent = "$" + Math.round(annualTax).toLocaleString();
+      taxEl.className = "tax-amount";
+      document.getElementById("taxNote").textContent = `${fmtP(s - r)}/mo extra — ${fmtP(annualTax)} wasted per year`;
     } else {
-      document.getElementById("taxAmount").textContent = "$0";
-      document.getElementById("taxDesc").textContent = "Both are free at this volume";
+      taxEl.textContent = "$0";
+      taxEl.className = "tax-amount tax-zero";
+      document.getElementById("taxNote").textContent = "Both tools are free at this volume";
     }
 
     buildTable(events);
