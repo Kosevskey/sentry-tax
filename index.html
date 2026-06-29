@@ -328,6 +328,21 @@
     }
     .btn-ghost:hover { color: var(--text); border-color: var(--text-muted); }
 
+    /* ─── Share Button ─── */
+    .btn-share {
+      background: none;
+      border: none;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-family: inherit;
+      transition: color .1s;
+    }
+    .btn-share:hover { color: var(--text); }
+
     /* ─── Footer ─── */
     footer {
       border-top: 1px solid var(--border);
@@ -442,8 +457,11 @@
     <div class="cta-section">
       <h2>Stop paying the Sentry Tax.</h2>
       <p>Two lines of Python. Same monitoring. A fraction of the price.</p>
-      <a href="https://app.getravn.com/register" class="btn-primary">Try Ravn free</a>
-      <a href="https://getravn.com/sentry-alternative.html" class="btn-ghost">Full comparison</a>
+      <a href="https://app.getravn.com/register?utm_source=sentry-tax&utm_medium=calculator&utm_campaign=sentry-comparison" class="btn-primary">Try Ravn free</a>
+      <a href="https://getravn.com/sentry-alternative.html?utm_source=sentry-tax&utm_medium=calculator&utm_campaign=sentry-comparison" class="btn-ghost">Full comparison</a>
+      <div style="margin-top:20px;">
+        <button class="btn-share" id="shareBtn" onclick="copyLink()">Share this calculation ↗</button>
+      </div>
     </div>
 
     <footer>
@@ -461,11 +479,11 @@
     return 26 + Math.max(0, e - 50000) * 0.000290;
   }
 
+  // Ravn plans: Free=100k events/$0, Solo=1M/$9.99, Team=10M/$19.99, Business=100M/$49.99
   function ravnPrice(e) {
-    if (e <= 5000)     return 0;
-    if (e <= 50000)    return 9.99;
-    if (e <= 250000)   return 19.99;
-    if (e <= 1000000)  return 49.99;
+    if (e <= 100000)   return 0;
+    if (e <= 1000000)  return 9.99;
+    if (e <= 10000000) return 19.99;
     return 49.99;
   }
 
@@ -476,9 +494,9 @@
   }
 
   function ravnPlan(e) {
-    if (e <= 5000)    return "Free";
-    if (e <= 50000)   return "Solo";
-    if (e <= 250000)  return "Team";
+    if (e <= 100000)   return "Free";
+    if (e <= 1000000)  return "Solo";
+    if (e <= 10000000) return "Team";
     return "Business";
   }
 
@@ -549,6 +567,40 @@
     }
 
     buildTable(events);
+  }
+
+  // ─── URL param: ?events=1M / ?events=250k / ?events=100000 ───────────────
+  function parseEventsParam() {
+    const raw = new URLSearchParams(location.search).get("events");
+    if (!raw) return null;
+    const n = raw.toLowerCase().replace(/,/g, "");
+    if (n.endsWith("m"))  return parseFloat(n) * 1000000;
+    if (n.endsWith("k"))  return parseFloat(n) * 1000;
+    return parseInt(n, 10) || null;
+  }
+
+  function eventsToSlider(events) {
+    let best = 0, bestDist = Infinity;
+    PTS.forEach((v, i) => { const d = Math.abs(v - events); if (d < bestDist) { bestDist = d; best = i; } });
+    return best;
+  }
+
+  const initEvents = parseEventsParam();
+  if (initEvents) {
+    document.getElementById("eventSlider").value = eventsToSlider(initEvents);
+  }
+
+  // ─── Share current calculation ───────────────────────────────────────────
+  function copyLink() {
+    const v = +document.getElementById("eventSlider").value;
+    const events = PTS[v];
+    const label = fmtE(events).replace(" ", "");
+    const url = location.origin + location.pathname + "?events=" + label;
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.getElementById("shareBtn");
+      btn.textContent = "Link copied ✓";
+      setTimeout(() => { btn.textContent = "Share this calculation ↗"; }, 2000);
+    });
   }
 
   document.getElementById("eventSlider").addEventListener("input", update);
